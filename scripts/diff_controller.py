@@ -13,7 +13,7 @@ class DiffController(Node):
         self.subscriber_odom_=self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
         self.subscriber_target_=self.create_subscription( Float64MultiArray, '/target', self.target_callback, 10)
         self.publishers_cmd_vel_=self.create_publisher(Twist, '/cmd_vel', 10)
-        self.target_x=0.0 #empty value 
+        self.target_x=0.0 
         self.target_y=0.0
 
       
@@ -30,7 +30,7 @@ class DiffController(Node):
         siny_cosp = 2 * (qw * qz + qx * qy)
         cosy_cosp = 1 - 2 * (qy * qy + qz * qz)
         theta_current = math.atan2(siny_cosp, cosy_cosp)
-        # Math Formula 1: Distance Error (Pythagorean theorem)
+        # Math Formula 1: Distance Error
         distance_error = math.sqrt((self.target_x - x_current)**2 + (self.target_y - y_current)**2)
         
         # Math Formula 2: Desired Heading Angle (Alpha)
@@ -39,7 +39,7 @@ class DiffController(Node):
         # Math Formula 3: Angular Error
         angle_error = alpha - theta_current
         angle_error = math.atan2(math.sin(angle_error), math.cos(angle_error))
-        #Normalize angle_error to stay within [-pi, pi] eg 90 vs -270
+        #Normalize angle_error to stay within [-pi, pi] 
         self.get_logger().info(
             f"Target: ({self.target_x}, {self.target_y}) | "
             f"Dist : {distance_error:.2f}m | "
@@ -60,12 +60,9 @@ class DiffController(Node):
     
 
     def target_callback(self, FMAmsg):
-        #FMAmsg = Float64MultiArray() # with this we can specify the target position
-        # also PoseStamped can be used for this purpose
-        #FMAmsg.data = [5.0, 5.0, 0.0]
-        #self.subscriber_odom_.publish(FMAmsg)
-         #all this is not needed if we are getting this FMAmsg from a terminal or another node
-        self.target_x = FMAmsg.data[0]
+        #PoseStamped can be used for this purpose also
+        # data published from another terminal or another node(in our case)
+        self.target_x = FMAmsg.data[0] 
         self.target_y = FMAmsg.data[1]
 
 
