@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<robot name="diff_robot">
+  <link name="base_footprint"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+  </joint>
+  <!-- base_link: flat cylinder chassis -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.36" length="0.06"/>
+      </geometry>
+      <material name="orange"><color rgba="0.9 0.4 0.05 1"/></material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.36" length="0.06"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="10.8"/>
+      <inertia ixx="0.486" ixy="0" ixz="0" iyy="0.486" iyz="0" izz="0.729"/>
+    </inertial>
+  </link>
+  <!-- Left wheel -->
+  <link name="left_wheel">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.12" length="0.075"/></geometry>
+      <material name="black"><color rgba="0.05 0.05 0.05 1"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.12" length="0.075"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.72"/>
+      <inertia ixx="0.0045" ixy="0" ixz="0" iyy="0.0045" iyz="0" izz="0.0045"/>
+    </inertial>
+  </link>
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel"/>
+    <origin xyz="0 0.39 -0.06" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+  <!-- Right wheel -->
+  <link name="right_wheel">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.12" length="0.075"/></geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry><cylinder radius="0.12" length="0.075"/></geometry>
+    </collision>
+    <inertial>
+      <mass value="0.72"/>
+      <inertia ixx="0.0045" ixy="0" ixz="0" iyy="0.0045" iyz="0" izz="0.0045"/>
+    </inertial>
+  </link>
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel"/>
+    <origin xyz="0 -0.39 -0.06" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+<!-- Skid plate (rear support, fixed) -->
+  <link name="skid_plate">
+    <visual>
+      <geometry>
+        <box size="0.15 0.18 0.015"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.15 0.18 0.015"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.18"/>
+      <inertia ixx="0.00003" ixy="0" ixz="0" iyy="0.00003" iyz="0" izz="0.00003"/>
+    </inertial>
+  </link>
+  <joint name="skid_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="skid_plate"/>
+    <origin xyz="-0.27 0 -0.135" rpy="0 0 0"/>
+  </joint>
+  <gazebo reference="skid_plate">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+  </gazebo>
+  <gazebo reference="left_wheel">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+  <gazebo reference="right_wheel">
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+  </gazebo>
+
+<gazebo>
+  <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+    <!-- Wheel Joints -->
+
+    <left_joint>left_wheel_joint</left_joint>
+    <right_joint>right_wheel_joint</right_joint>
+    
+    <!-- Kinematics -->
+
+    <wheel_separation>0.78</wheel_separation> <!-- meters -->
+    <wheel_diameter>0.24</wheel_diameter>     <!-- meters -->
+    <max_linear_acceleration>1.0</max_linear_acceleration>
+    <max_angular_acceleration>2.0</max_angular_acceleration>
+    <max_linear_velocity>1.0</max_linear_velocity>
+    <max_angular_velocity>2.0</max_angular_velocity>
+
+    <!-- ROS 2 / Gazebo Bridges -->
+
+    <topic>cmd_vel</topic>
+
+    <odom_topic>odom</odom_topic>
+
+    <tf_topic>tf</tf_topic>
+
+    <frame_id>odom</frame_id>
+
+    <child_frame_id>base_link</child_frame_id>
+
+    <odom_publisher_frequency>30</odom_publisher_frequency>
+    
+  </plugin>
+</gazebo>
+
+</robot>
