@@ -24,9 +24,17 @@ source install/setup.bash
 ```bash
 ros2 launch diff_robot diff_robot.launch.py
 ```
+## Run
+```bash
+# In a second terminal
+ros2 run diff_robot diff_PID.py
+
+# In a third terminal
+ros2 run diff_robot diff_target.py
+```
 
 ## Package Structure
 - `urdf/` — robot description
 - `launch/` — launch files
-- `scripts/` — PID controller and target publisher nodes
+- `scripts/` — PID controller,a simple controller and target publisher nodes
 - `config/` — Gazebo bridge configuration
