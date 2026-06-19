@@ -1,6 +1,7 @@
 # diff_robot
 
 A differential drive robot simulation in ROS2 Jazzy + Gazebo Harmonic.
+(odometry based)
 
 ## Features
 - Flat cylinder chassis with two drive wheels and a skid plate
