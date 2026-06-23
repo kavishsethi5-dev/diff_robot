@@ -68,7 +68,7 @@
     <origin xyz="0 -0.39 -0.06" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
   </joint>
-<!-- Skid plate (rear support, fixed) -->
+  <!-- Skid plate (rear support, fixed) -->
   <link name="skid_plate">
     <visual>
       <geometry>
@@ -89,9 +89,36 @@
   <joint name="skid_joint" type="fixed">
     <parent link="base_link"/>
     <child link="skid_plate"/>
-    <origin xyz="-0.27 0 -0.135" rpy="0 0 0"/>
+    <origin xyz="-0.27 0 -0.1725" rpy="0 0 0"/>
+  </joint>
+  <!-- Skid plate (front support, fixed) -->
+  <link name="skid_plate_front">
+    <visual>
+      <geometry>
+        <box size="0.15 0.18 0.015"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.15 0.18 0.015"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.18"/>
+      <inertia ixx="0.00003" ixy="0" ixz="0" iyy="0.00003" iyz="0" izz="0.00003"/>
+    </inertial>
+  </link>
+  <joint name="skid_joint_front" type="fixed">
+    <parent link="base_link"/>
+    <child link="skid_plate_front"/>
+    <origin xyz="0.27 0 -0.1725" rpy="0 0 0"/>
   </joint>
   <gazebo reference="skid_plate">
+    <mu1>0.1</mu1>
+    <mu2>0.1</mu2>
+  </gazebo>
+  <gazebo reference="skid_plate_front">
     <mu1>0.1</mu1>
     <mu2>0.1</mu2>
   </gazebo>
@@ -103,38 +130,31 @@
     <mu1>1.0</mu1>
     <mu2>1.0</mu2>
   </gazebo>
+  <gazebo>
+  <plugin filename="gz-sim-pose-publisher-system"
+          name="gz::sim::systems::PosePublisher">
+    <publish_model_pose>true</publish_model_pose>
+    <publish_link_pose>false</publish_link_pose>
+    <update_frequency>30</update_frequency>
+  </plugin>
+</gazebo>
 
 <gazebo>
   <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
-    <!-- Wheel Joints -->
-
     <left_joint>left_wheel_joint</left_joint>
     <right_joint>right_wheel_joint</right_joint>
-    
-    <!-- Kinematics -->
-
-    <wheel_separation>0.78</wheel_separation> <!-- meters -->
-    <wheel_diameter>0.24</wheel_diameter>     <!-- meters -->
+    <wheel_separation>0.78</wheel_separation>
+    <wheel_diameter>0.24</wheel_diameter>
     <max_linear_acceleration>1.0</max_linear_acceleration>
     <max_angular_acceleration>2.0</max_angular_acceleration>
     <max_linear_velocity>1.0</max_linear_velocity>
     <max_angular_velocity>2.0</max_angular_velocity>
-
-    <!-- ROS 2 / Gazebo Bridges -->
-
     <topic>cmd_vel</topic>
-
     <odom_topic>odom</odom_topic>
-
     <tf_topic>tf</tf_topic>
-
     <frame_id>odom</frame_id>
-
     <child_frame_id>base_link</child_frame_id>
-
     <odom_publisher_frequency>30</odom_publisher_frequency>
-    
   </plugin>
 </gazebo>
-
 </robot>

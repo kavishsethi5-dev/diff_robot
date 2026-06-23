@@ -4,13 +4,14 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Float64MultiArray
+from geometry_msgs.msg import Pose
 import math
 
 class diff_PID(Node):
 
     def __init__(self):
         super().__init__('diff_PID')
-        self.subscriber_odom_=self.create_subscription(Odometry, '/odom', self.odom_callback, 10)
+        self.create_subscription(Pose, '/model/my_robot/pose', self.odom_callback, 10)
         self.subscriber_target_=self.create_subscription( Float64MultiArray, '/target', self.target_callback, 10)
         self.publishers_cmd_vel_=self.create_publisher(Twist, '/cmd_vel', 10)
         self.target_x=0.0 #empty value 
@@ -106,18 +107,12 @@ class diff_PID(Node):
 
       
     def odom_callback(self, msg):# 1. Extract the raw 4D Quaternion fields
-        
-       #now saving as instance variables
-        # 1. Extract Current Position (X, Y)
-        self.x_current = msg.pose.pose.position.x
-        self.y_current = msg.pose.pose.position.y
-
-        # 2. Extract and Calculate Current Heading (Theta)
-        self.qx = msg.pose.pose.orientation.x
-        self.qy = msg.pose.pose.orientation.y
-        self.qz = msg.pose.pose.orientation.z
-        self.qw = msg.pose.pose.orientation.w
-
+        self.x_current = msg.position.x      # was msg.pose.pose.position.x
+        self.y_current = msg.position.y
+        self.qx = msg.orientation.x          # was msg.pose.pose.orientation.x
+        self.qy = msg.orientation.y
+        self.qz = msg.orientation.z
+        self.qw = msg.orientation.w
 
     
 
