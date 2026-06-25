@@ -21,6 +21,11 @@ class diff_PID(Node):
         self.kp = 1.2
         self.ki= 0.01
         self.kd = 0.05
+        #Decided to add angular kp,ki,kd values also (will add reason later )
+        self.kp_a = 4.0
+        self.ki_a = 0.01
+        self.kd_a = 0.05 #assuming similar values
+        
         ####Initializing variables####
         self.last_error = 0.0
         self.error_sum = 0.0
@@ -33,12 +38,18 @@ class diff_PID(Node):
         self.qy = 0.0
         self.qz = 0.0
         self.qw = 0.0
+        # similar variables for angular
+        self.last_error_a = 0.0
+        self.error_sum_a = 0.0
+        
+
+        
 
 
         #for now setting dt as 0.01, later I can see it in gazebo physics
 
 
-        #create timer?
+        #create timer
         time_period=0.01
         self.timer = self.create_timer( time_period , self.PID_callback)
 
@@ -60,6 +71,8 @@ class diff_PID(Node):
         angle_error = alpha - theta_current
         angle_error = math.atan2(math.sin(angle_error), math.cos(angle_error))
         #Normalize angle_error to stay within [-pi, pi] eg 90 vs -270
+        # defining self current error first
+        self.current_error_a = angle_error
 
 
         self.get_logger().info(
@@ -70,28 +83,40 @@ class diff_PID(Node):
         time_step=0.01
         #now using the calc to get PID
         P = self.kp * self.current_error
-        self.error_sum += self.current_error * time_step
         I = self.ki * self.error_sum
         error_change = (self.current_error - self.last_error) / time_step
         D = self.kd * error_change
 
+        #PID calc for angular
+        P_a = self.kp_a * self.current_error_a
+        self.error_sum_a += self.current_error_a * time_step
+        I_a = self.ki_a * self.error_sum_a
+        error_change_a = (self.current_error_a - self.last_error_a) / time_step
+        D_a = self.kd_a * error_change_a
+
+
         #updating the last value
         self.last_error = self.current_error
+        self.last_error_a = self.current_error_a
+        
 
 
         #final
-        pid_dist=P+I+D
+        pid_dist = min(P + I + D, 1.0)  
+        pid_angle = max(-2.0, min(2.0, P_a + I_a + D_a))
 
 
         if distance_error < 0.1:  #this was done to stop it from circling at the end
             fmsg = Twist()   # zero velocity
             self.publishers_cmd_vel_.publish(fmsg)
             return           # exits PID_callback right here
-
-
+        
+        
         fmsg = Twist()
-        fmsg.linear.x =  pid_dist
-        fmsg.angular.z = angle_error
+        heading_factor = max(0.0, math.cos(angle_error)) # cos angle error or cos pid_angle?
+        # this is to stop the spinning (also tuning ka_a)
+        fmsg.linear.x =  pid_dist* heading_factor  # drives at ~0 at 163°, full speed when aligned
+        fmsg.angular.z = pid_angle
 
 
         #publish this message to cmd_vel
@@ -138,3 +163,5 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
+    

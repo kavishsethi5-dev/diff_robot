@@ -43,6 +43,14 @@ install(PROGRAMS
   scripts/diff_PID.py
   DESTINATION lib/${PROJECT_NAME}
 )
+install(PROGRAMS
+  scripts/seq_diff_target.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+install(PROGRAMS
+  scripts/eval_diff.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 ament_package()
 
