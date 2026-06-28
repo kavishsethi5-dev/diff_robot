@@ -10,7 +10,7 @@ class seq_diff_target(Node):
         self.publisher_ = self.create_publisher(Float64MultiArray, '/target', 10)
         self.create_subscription(Pose, '/model/my_robot/pose', self.callback, 10)
         self.targets = [
-            (5.0, 5.0),
+            (5.0, 4.0),
             (5.0, -5.0),
             (-5.0, -5.0),
             (-5.0, 5.0),
@@ -50,12 +50,15 @@ class seq_diff_target(Node):
         import math
         dist = math.sqrt((self.current_target_x - self.x_current)**2 +
                          (self.current_target_y - self.y_current)**2)
-        if dist < 0.1:
+        if dist < 0.15:
             self.send_next()
+        if dist < 0.5:
+            self.get_logger().info(f'dist to target: {dist:.3f}')
 
     def callback(self, msg):
         self.x_current = msg.position.x
         self.y_current = msg.position.y
+       
 
 def main(args=None):  
 

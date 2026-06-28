@@ -106,7 +106,7 @@ class diff_PID(Node):
         pid_angle = max(-2.0, min(2.0, P_a + I_a + D_a))
 
 
-        if distance_error < 0.1:  #this was done to stop it from circling at the end
+        if distance_error < 0.15:  #this was done to stop it from circling at the end
             fmsg = Twist()   # zero velocity
             self.publishers_cmd_vel_.publish(fmsg)
             return           # exits PID_callback right here
