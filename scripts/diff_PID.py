@@ -47,6 +47,8 @@ class diff_PID(Node):
 
 
         #for now setting dt as 0.01, later I can see it in gazebo physics
+        self.target_x = None
+        self.target_y = None
 
 
         #create timer
@@ -54,6 +56,10 @@ class diff_PID(Node):
         self.timer = self.create_timer( time_period , self.PID_callback)
 
     def PID_callback(self):
+
+        # Safety
+        if self.target_x is None:
+            return 
        
         siny_cosp = 2 * (self.qw * self.qz + self.qx * self.qy)
         cosy_cosp = 1 - 2 * (self.qy * self.qy + self.qz * self.qz)
@@ -84,6 +90,7 @@ class diff_PID(Node):
         #now using the calc to get PID
         P = self.kp * self.current_error
         I = self.ki * self.error_sum
+        self.error_sum += self.current_error * time_step
         error_change = (self.current_error - self.last_error) / time_step
         D = self.kd * error_change
 
