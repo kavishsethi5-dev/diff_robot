@@ -150,10 +150,6 @@ class diff_PID(Node):
 
     def target_callback(self, FMAmsg):
         #FMAmsg = Float64MultiArray() # with this we can specify the target position
-        # also PoseStamped can be used for this purpose
-        #FMAmsg.data = [5.0, 5.0, 0.0]
-        #self.subscriber_odom_.publish(FMAmsg)
-         #all this is not needed if we are getting this FMAmsg from a terminal or another node
         self.target_x = FMAmsg.data[0]
         self.target_y = FMAmsg.data[1]
 
